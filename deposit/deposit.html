@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Deposit - VirtuSIM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://files.catbox.moe/mb8h6p.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    body { display: flex; flex-direction: column; }
+
+    header {
+      background: rgba(0,0,0,0.6);
+      padding: 1em;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      z-index: 1;
+    }
+
+    .container {
+      flex: 1;
+      padding: 2em;
+    }
+
+    .form-box {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.5em;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .form-box h2 {
+      margin-bottom: 1em;
+      text-align: center;
+    }
+
+    .form-box input {
+      width: 100%;
+      padding: 0.8em;
+      margin-bottom: 1em;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .form-box button {
+      width: 100%;
+      padding: 0.8em;
+      background: #4caf50;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .result-box {
+      margin-top: 1.5em;
+      padding: 1em;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .qr-image {
+      margin-top: 1em;
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      padding: 0.6em 0;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      z-index: 999;
+    }
+
+    .bottom-nav button {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 0.9em;
+      position: relative;
+    }
+
+    .bottom-nav button.active {
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 6px #fff;
+    }
+
+    .bottom-nav button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Deposit Saldo</header>
+
+  <div class="container">
+    <div class="form-box">
+      <h2>Form Deposit</h2>
+      <input type="number" id="amount" placeholder="Jumlah (min Rp5000)">
+      <input type="tel" id="phone" placeholder="Nomor HP (untuk konfirmasi)">
+      <button onclick="submitDeposit()">Deposit</button>
+      <div class="result-box" id="result"></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button onclick="goToPage('../dashboard/index.html')">🏠 Home</button>
+    <button onclick="goToPage('../transaksi/transaksi.html')">📋 Transaction</button>
+    <button class="active">➕ Deposit</button>
+    <button onclick="goToPage('../saldo/saldo.html')">💰 Wallet</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <script>
+    const apikey = localStorage.getItem("apikey");
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "../login/login.html";
+    }
+
+    function goToPage(url) {
+      window.location.href = url;
+    }
+
+    function submitDeposit() {
+      const amount = document.getElementById("amount").value;
+      const phone = document.getElementById("phone").value;
+      const resultBox = document.getElementById("result");
+
+      if (!amount || !phone) {
+        alert("Harap isi semua kolom.");
+        return;
+      }
+
+      const url = `../routes/deposit.php?apikey=${encodeURIComponent(apikey)}&amount=${amount}&phone=${encodeURIComponent(phone)}`;
+
+      resultBox.innerHTML = "Memproses...";
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status) {
+            const d = data.data;
+            resultBox.innerHTML = `
+              <p><strong>Metode:</strong> ${d.method}</p>
+              <p><strong>Jumlah Dibayar:</strong> Rp ${d.balance_pay}</p>
+              <p><strong>Saldo Masuk:</strong> Rp ${d.balance_receive}</p>
+              <img src="${d.qr}" class="qr-image" alt="QR Code">
+              <p style="margin-top: 1em;">${d.note}</p>
+            `;
+          } else {
+            resultBox.innerHTML = `<p style="color: orange;">${data.msg}</p>`;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          resultBox.innerHTML = `<p style="color: red;">Terjadi kesalahan saat menghubungi server.</p>`;
+        });
+    }
+  </script>
+
+</body>
+</html>
