@@ -1,0 +1,303 @@
+ 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - VirtuSIM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://files.catbox.moe/mb8h6p.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    body { display: flex; flex-direction: column; }
+
+    header {
+      background: rgba(0,0,0,0.6);
+      padding: 1em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      font-weight: bold;
+      font-size: 1.1em;
+      z-index: 1;
+    }
+
+    .menu-icon {
+      position: absolute;
+      left: 1em;
+      font-size: 1.5em;
+      cursor: pointer;
+      z-index: 1002;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 1000;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 260px; height: 100vh;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(15px);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+      box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+    }
+
+    .sidebar.active { transform: translateX(0); }
+    .sidebar .avatar { text-align: center; margin-top: 2em; }
+    .sidebar .avatar img {
+      width: 80px; border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 12px rgba(255,255,255,0.5);
+      margin-bottom: 0.5em;
+    }
+
+    .sidebar .username {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 2em;
+    }
+
+    .sidebar a {
+      display: block;
+      background: rgba(255,255,255,0.1);
+      padding: 0.8em 1em;
+      margin: 0.5em;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .sidebar a:hover { background: rgba(255,255,255,0.2); }
+
+    .container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1em;
+      padding-bottom: 90px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+      padding: 1em;
+      margin-bottom: 1em;
+    }
+
+    .balance h2 { font-size: 1.7em; margin-top: 0.3em; }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+      gap: 10px;
+    }
+
+    .service-item {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.8em;
+      border-radius: 10px;
+      font-size: 0.95em;
+    }
+
+    .service-item span { display: block; margin: 3px 0; }
+
+    .service-item button {
+      margin-top: 5px;
+      padding: 6px 10px;
+      background: #4caf50;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      padding: 0.6em 0;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      z-index: 999;
+    }
+
+    .bottom-nav button {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 0.9em;
+      position: relative;
+    }
+
+    .bottom-nav button.active {
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 6px #fff;
+    }
+
+    .bottom-nav button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    Virtual Number
+  </header>
+
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="avatar">
+      <img src="https://img.icons8.com/fluency/96/chat.png" alt="avatar">
+    </div>
+    <div class="username" id="side-username">User</div>
+    <a href="https://wa.me/6288276746473" target="_blank">📞 Help Center</a>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <p>Hello <span id="user-name">...</span><br>Balance Amount</p>
+      <h2 id="balance">Loading...</h2>
+    </div>
+
+    <div class="card">
+      <p>Price List WhatsApp Numbers 📱</p>
+    </div>
+
+    <div class="services" id="wa-list">Loading...</div>
+  </div>
+
+  <div class="bottom-nav">
+  <button class="active">🏠 Home</button>
+<button onclick="goToTransaction()">📋 Transaction</button>
+  <button onclick="goTo('../deposit/deposit.html')"> ➕ Deposit</button>
+  <button onclick="goTo('../saldo/saldo.html')">💰 Wallet</button>
+  <button onclick="logout()">🚪 Logout</button>
+</div>
+
+  <script>
+    const apikey = localStorage.getItem("apikey");
+    const username = localStorage.getItem("username");
+
+    if (!apikey || !username) {
+      location.href = "../login/login.html";
+    }
+
+    document.getElementById("user-name").textContent = username;
+    document.getElementById("side-username").textContent = username;
+
+    fetch("../routes/saldo.php?apikey=" + encodeURIComponent(apikey))
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("balance").textContent =
+          data.status ? `${data.balance} / $${data.usd_balance}` : "Gagal ambil saldo";
+      });
+
+    fetch("../routes/whatsapp.php?apikey=" + encodeURIComponent(apikey))
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("wa-list");
+        list.innerHTML = "";
+        if (data.status && data.data.length) {
+          data.data.forEach(service => {
+            if (service.status === "1") {
+              const div = document.createElement("div");
+              div.className = "service-item";
+              div.innerHTML = `
+                <span><strong>${service.country}</strong></span>
+                <span>💵 ${service.price}</span>
+                <span>📦 Stock: ${service.tersedia}</span>
+                <span style="color: violet">🆔 ID: ${service.id}</span>
+                <button onclick="orderNow('${service.id}', '${service.country}')">🛒 Order</button>
+              `;
+              list.appendChild(div);
+            }
+          });
+        } else {
+          list.innerHTML = "<p>No active services.</p>";
+        }
+      });
+
+    
+function orderNow(serviceId, country) {
+  const operator = "any";
+  const url = `../routes/order.php?apikey=${encodeURIComponent(apikey)}&service=${serviceId}&operator=${operator}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status) {
+        // Simpan data order ke localStorage
+        localStorage.setItem("last_order", JSON.stringify(data.data));
+        location.href = "../transaksi/transaksi.html";
+      } else {
+        const pesan = data.data?.msg || data.msg || "Kemungkinan saldo tidak cukup atau service error.";
+        alert("Gagal order: " + pesan);
+      }
+    })
+    .catch(err => {
+      alert("Gagal menghubungi server.");
+      console.error(err);
+    });
+}
+ 
+
+  function goToTransaction() {
+  window.location.href = "../transaksi/transaksi.html";
+}
+
+    function logout() {
+      localStorage.clear();
+      location.href = "../login/login.html";
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.add("active");
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("overlay").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
