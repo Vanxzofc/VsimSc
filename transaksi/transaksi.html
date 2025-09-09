@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Transaksi - VirtuSIM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://files.catbox.moe/mb8h6p.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    body { display: flex; flex-direction: column; }
+
+    header {
+      background: rgba(0,0,0,0.6);
+      padding: 1em;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .container {
+      flex: 1;
+      padding: 1.2em;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.6);
+      border-radius: 12px;
+      padding: 1em;
+      margin-bottom: 1em;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+
+    .card h3 { margin-bottom: 0.5em; }
+    .card .number {
+      font-size: 1.3em;
+      margin-bottom: 0.3em;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 1em;
+    }
+
+    .buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .ready { background: #7e57c2; color: #fff; }
+    .cancel { background: #e53935; color: #fff; }
+    .refresh { background: #00acc1; color: #fff; margin-top: 0.5em; }
+
+    .otp-box {
+      margin-top: 1em;
+      background: rgba(255,255,255,0.1);
+      padding: 0.8em;
+      border-radius: 8px;
+      font-size: 1.1em;
+      text-align: center;
+      display: none;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      padding: 0.6em 0;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      z-index: 999;
+    }
+
+    .bottom-nav button {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 0.9em;
+      position: relative;
+    }
+
+    .bottom-nav button.active {
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 6px #fff;
+    }
+
+    .bottom-nav button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>Transaksi Berjalan</header>
+
+  <div class="container" id="transaction-area">
+    <div class="card">
+      <div class="number">Memuat daftar order...</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button onclick="goToPage('../dashboard/index.html')">🏠 Home</button>
+    <button class="active">📋 Transaction</button>
+    <button onclick="goToPage('../deposit/deposit.html')">➕ Deposit</button>
+    <button onclick="goToPage('../saldo/saldo.html')">💰 Wallet</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+
+<script>
+  const apikey = localStorage.getItem("apikey");
+  const container = document.getElementById("transaction-area");
+  const polling = {};
+
+  if (!apikey) {
+    alert("API Key tidak ditemukan.");
+    location.href = "../login/login.html";
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "../login/login.html";
+  }
+
+  function goToPage(url) {
+    window.location.href = url;
+  }
+
+  function fetchOrders() {
+  const apikey = localStorage.getItem('apikey');
+  if (!apikey) {
+    container.innerHTML = `
+      <div class="card">
+        <div class="number">API Key tidak ditemukan.</div>
+      </div>
+    `;
+    return;
+  }
+
+  fetch(`../routes/activeorder.php?apikey=${apikey}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.status || !Array.isArray(data.data) || data.data.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="number">Tidak ada transaksi aktif.</div>
+          </div>
+        `;
+        return;
+      }
+        container.innerHTML = "";
+
+        data.data.forEach(order => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.id = "order-" + order.id;
+
+          card.innerHTML = `
+            <h3>Order ID#${order.id}</h3>
+            <div class="number">${order.number}</div>
+            <div>${order.service_name}</div>
+            <div class="otp-box" id="otp-${order.id}">Menunggu Ready...</div>
+            <div class="buttons">
+              <button class="ready" onclick="setReady('${order.id}')">▶️ Ready</button>
+              <button class="cancel" onclick="setCancel('${order.id}')">❌ Cancel</button>
+            </div>
+            <button class="refresh" onclick="loadOTP('${order.id}')">🔄 Refresh OTP</button>
+          `;
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error("Fetch orders error:", err);
+        container.innerHTML = `<div class="card"><div class="number">Gagal mengambil data order.</div></div>`;
+      });
+  }
+
+  function setReady(id) {
+    fetch(`../routes/orderweb/statusorder.php?id=${id}&status=1&apikey=${apikey}`)
+      .then(res => res.json())
+      .then(data => {
+        const msg = data?.msg || "Tidak ada respon dari server.";
+        alert(msg);
+        if (data.status) {
+          const box = document.getElementById(`otp-${id}`);
+          if (box) {
+            box.style.display = "block";
+            loadOTP(id);
+            polling[id] = setInterval(() => loadOTP(id), 7000);
+          }
+        }
+      })
+      .catch(err => {
+        alert("Gagal mengirim status Ready.");
+        console.error(err);
+      });
+  }
+
+  function setCancel(id) {
+    fetch(`../routes/orderweb/statusorder.php?id=${id}&status=2&apikey=${apikey}`)
+      .then(res => res.json())
+      .then(data => {
+        const msg = data?.msg || "Tidak ada respon dari server.";
+        alert(msg);
+        if (data.status) {
+          if (polling[id]) clearInterval(polling[id]);
+          const el = document.getElementById("order-" + id);
+          if (el) el.remove();
+        }
+      })
+      .catch(err => {
+        alert("Gagal mengirim status Cancel.");
+        console.error(err);
+      });
+  }
+
+  function loadOTP(id) {
+    const box = document.getElementById(`otp-${id}`);
+    if (!box) return;
+
+    box.style.display = "block";
+    box.textContent = "Mengambil kode OTP...";
+
+    fetch(`../routes/orderweb/otp.php?id=${id}&apikey=${apikey}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status && data.data?.sms) {
+          box.innerHTML = `<strong>OTP:</strong> ${data.data.sms}`;
+          if (polling[id]) clearInterval(polling[id]);
+        } else {
+          box.textContent = "Belum ada kode OTP.";
+        }
+      })
+      .catch(err => {
+        box.textContent = "Gagal mengambil kode.";
+        console.error(err);
+      });
+  }
+
+  // Initial fetch
+  fetchOrders();
+
+  // Auto refresh setiap 10 detik
+  setInterval(fetchOrders, 10000);
+</script>
+
+</body>
+</html>
+ 
