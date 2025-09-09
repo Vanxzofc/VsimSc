@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - VirtuSIM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body, html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    video#bg-video {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+.login-box {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5em;
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  animation: slideUp 1s ease forwards;
+  position: relative;
+  z-index: 1;
+  color: #fff;
+}
+
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .login-box img {
+      width: 80px;
+      margin-bottom: 1em;
+    }
+
+.login-box input {
+  width: 100%;
+  padding: 0.6em;
+  margin-bottom: 0.8em;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95em;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 0.65em;
+  border: none;
+  border-radius: 8px;
+  background: #7b4dff;
+  color: white;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+    .login-box button:hover {
+      background: #5d32e9;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background video -->
+  <video id="bg-video" autoplay loop muted playsinline>
+    <source src="https://files.catbox.moe/ysg7er.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="login-box">
+    <img src="https://img.icons8.com/fluency/96/chat.png" alt="avatar">
+    <h2 style="margin-bottom: 1em;">Welcome Back!</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="text" id="apikey" placeholder="API Key VirtuSIM">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById('username').value;
+      const key = document.getElementById('apikey').value;
+      if (!user || !key) return alert("Lengkapi semua data!");
+
+      localStorage.setItem("apikey", key);
+      localStorage.setItem("username", user);
+
+      window.location.href = "../dashboard/index.html";
+    }
+  </script>
+</body>
+</html>
