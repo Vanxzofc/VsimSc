@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>VirtuSIM Tribute</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+    video.bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .audio-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      padding: 6px;
+      border: 1px solid #fff;
+      cursor: pointer;
+      z-index: 10;
+      color: #fff;
+      font-size: 0.9em;
+      box-shadow: 0 0 8px rgba(255,255,255,0.3);
+    }
+
+    .info-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 50%;
+      font-size: 0.9em;
+      cursor: pointer;
+      z-index: 11;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+
+    .bubble {
+      position: fixed;
+      top: 60px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      padding: 12px 18px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      color: #fff;
+      font-size: 0.9em;
+      max-width: 300px;
+      z-index: 10;
+      display: none;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .bubble.visible {
+      display: block;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0); }
+    }
+
+    a {
+      color: #ffd700;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      padding: 6px 14px;
+      border-radius: 18px;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      text-decoration: none;
+      font-size: 0.85em;
+      font-weight: 500;
+      z-index: 20;
+    }
+
+.powered-by {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.15);
+  z-index: 100;
+  animation: fadein 1.5s ease;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+    .login-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Video -->
+  <video class="bg" autoplay loop muted playsinline>
+    <source src="https://files.catbox.moe/ysg7er.mp4" type="video/mp4">
+  </video>
+
+  <!-- Audio -->
+  <audio id="bg-audio" loop>
+    <source src="https://files.catbox.moe/73ywvh.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Buble Info -->
+  <div class="bubble" id="bubble">
+  Untuk <strong>SkyTrcX ( R )  Ryuichi</strong>, Sang Pengembang Web Yang Luar Biasa. 🔥<br><br>
+  Terima Kasih Kepada Penyedia API <strong>VirtuSIM</strong> Yang Telah Memungkinkan Layanan Ini Berjalan Mulus.<br>
+  Website: <a href="https://virtusim.com/" target="_blank" style="color:#00cfff; text-decoration: underline;">virtusim.com</a><br><br>
+  <em>“Build With Passion, Powered By Vision”</em>
+</div>
+
+
+  <!-- Tombol Toggle Suara -->
+  <div class="audio-toggle" onclick="toggleAudio()" title="Toggle Audio">🔇</div>
+
+  <!-- Tombol Toggle Info -->
+  <div style="position: fixed; top: 20px; left: 20px; display: flex; align-items: center; z-index: 11;">
+  <div class="info-toggle" onclick="toggleInfo()" title="Tentang ?">🧩</div>
+  <a href="./info/apiinfo.html" style="margin-left: 10px; color: #fff; font-size: 0.85em; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); padding: 6px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 8px rgba(0,0,0,0.3); text-decoration: none;">
+    📚 Dokumentasi API
+  </a>
+</div>
+
+  <!-- Tombol Login -->
+  <a href="./dashboard/index.html" class="login-btn">🔐 Login</a>
+
+<div class="powered-by">Powered by SkyTrcX ( R )  Ryuichi</div>
+
+  <script>
+    const audio = document.getElementById('bg-audio');
+    const toggle = document.querySelector('.audio-toggle');
+    const bubble = document.getElementById('bubble');
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+        toggle.textContent = '🔊';
+      } else {
+        audio.pause();
+        toggle.textContent = '🔇';
+      }
+    }
+
+const customToggle = document.getElementById("customBubbleToggle");
+  const customBubble = document.getElementById("customBubble");
+
+  customToggle.addEventListener("click", () => {
+    customBubble.style.display = customBubble.style.display === "block" ? "none" : "block";
+  });
+    function toggleInfo() {
+      bubble.classList.toggle('visible');
+    }
+
+    window.addEventListener('load', () => {
+      audio.volume = 1;
+    });  
+  </script>
+
+</body>
+</html>
