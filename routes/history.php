@@ -1,0 +1,36 @@
+<?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Ambil API key dari URL
+if (!isset($_GET['apikey']) || empty($_GET['apikey'])) {
+    echo json_encode(["status" => false, "msg" => "API key wajib diisi di URL."]);
+    exit;
+}
+$apikey = $_GET['apikey'];
+
+// Bangun URL VirtuSIM
+$url = "https://virtusim.com/api/v2/json.php?api_key=" . urlencode($apikey) . "&action=order_history";
+
+// CURL
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+$response = curl_exec($ch);
+$err = curl_error($ch);
+curl_close($ch);
+
+// Handle Response
+if ($response) {
+    $data = json_decode($response, true);
+    if (!$data) {
+        echo json_encode(["status" => false, "msg" => "Gagal decode response JSON"]);
+    } else {
+        echo json_encode($data);
+    }
+} else {
+    echo json_encode(["status" => false, "msg" => "CURL Error: $err"]);
+}
