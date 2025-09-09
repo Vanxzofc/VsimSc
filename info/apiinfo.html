@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dokumentasi API - VirtuSIM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+      background: transparent;
+      color: #fff;
+    }
+
+    video.bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 960px;
+      margin: 60px auto 100px;
+    }
+
+    .api-box {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.15);
+      position: relative;
+    }
+
+    .api-box h3 {
+      margin-bottom: 8px;
+      font-size: 1.1em;
+      color: #00cfff;
+    }
+
+    .api-box code {
+      background: rgba(255,255,255,0.1);
+      padding: 6px 10px;
+      display: block;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      word-break: break-word;
+      font-size: 0.85em;
+    }
+
+    .api-box small {
+      display: block;
+      font-size: 0.85em;
+      color: #ddd;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 3px 10px;
+      font-size: 0.75em;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.12);
+      padding: 8px 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .back-link span {
+      margin-left: 6px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.6em;
+      text-shadow: 0 1px 2px #000;
+    }
+  </style>
+</head>
+<body>
+
+<video class="bg" autoplay loop muted playsinline>
+  <source src="https://files.catbox.moe/ysg7er.mp4" type="video/mp4">
+</video>
+
+<a class="back-link" href="../index.html">🧩 <span>Kembali</span></a>
+
+<div class="container">
+  <h1>📚 Dokumentasi API - VirtuSIM</h1>
+
+  <div class="api-box">
+    <h3>🔁 Deposit Balance</h3>
+    <code id="url1">https://vanzhosting.web.id/routes/deposit.php?apikey=&amount=5000&phone=08987654321</code>
+    <small>Validasi: <b>apikey</b>, <b>amount</b>, <b>phone</b></small>
+    <div class="copy-btn" onclick="copyText('url1')">Copy</div>
+  </div>
+
+  <div class="api-box">
+    <h3>💰 Balance Info</h3>
+    <code id="url2">https://vanzhosting.web.id/routes/saldo.php?apikey=</code>
+    <small>Validasi: <b>apikey</b></small>
+    <div class="copy-btn" onclick="copyText('url2')">Copy</div>
+  </div>
+
+  <div class="api-box">
+    <h3>📜 Mutasi Balance</h3>
+    <code id="url3">https://vanzhosting.web.id/routes/mutasi.php?apikey=</code>
+    <small>Validasi: <b>apikey</b></small>
+    <div class="copy-btn" onclick="copyText('url3')">Copy</div>
+  </div>
+
+  <div class="api-box">
+    <h3>📱 List All Number</h3>
+    <code id="url4">https://vanzhosting.web.id/routes/whatsapp.php?apikey=</code>
+    <small>Validasi: <b>apikey</b></small>
+    <div class="copy-btn" onclick="copyText('url4')">Copy</div>
+  </div>
+
+  <div class="api-box">
+    <h3>🛒 Order Number</h3>
+    <code id="url5">https://vanzhosting.web.id/routes/order.php?apikey=&service=743&operator=any</code>
+    <small>Validasi: <b>apikey</b>, <b>service</b>, <b>operator</b></small>
+    <div class="copy-btn" onclick="copyText('url5')">Copy</div>
+  </div>
+
+  <div class="api-box">
+    <h3>🛠️ Set Order</h3>
+    <code id="url6">https://vanzhosting.web.id/routes/statusorder.php?apikey=&id=743&status=2</code>
+    <small>Validasi: <b>apikey</b>, <b>id</b>, <b>status</b></small>
+    <small>Status:
+      <ul style="padding-left: 18px;">
+        <li><code>1</code> = ready</li>
+        <li><code>2</code> = cancel</li>
+        <li><code>3</code> = resend</li>
+        <li><code>4</code> = completed</li>
+      </ul>
+    </small>
+    <div class="copy-btn" onclick="copyText('url6')">Copy</div>
+  </div>
+
+  <div class="api-box">
+    <h3>🔐 OTP Check</h3>
+    <code id="url7">https://vanzhosting.web.id/routes/otp.php?apikey=&id=</code>
+    <small>Validasi: <b>apikey</b>, <b>id</b></small>
+    <div class="copy-btn" onclick="copyText('url7')">Copy</div>
+  </div>
+</div>
+
+<script>
+  function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('✅ Link berhasil dicopy!');
+    });
+  }
+</script>
+
+</body>
+</html>
